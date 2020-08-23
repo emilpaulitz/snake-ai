@@ -17,6 +17,8 @@ public class SnakeGame extends JPanel {
 
 	private Point foodLoc = new Point(18, 12), snakeHead = new Point(19, 10);
 
+	//private Point foodLoc = new Point(1, 2), snakeHead = new Point(30, 15);
+	
 	private LinkedList<Point> snakeBody = new LinkedList<Point>();
 
 	/**

@@ -2,6 +2,7 @@ package snakeAI;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
@@ -37,12 +38,12 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
-		Main x = new Main();
+		Main main = new Main();
 
 		// open main menu
 		JFrame sFrame = new JFrame("Snake Game");
 		JPanel JPanel = openMenu(sFrame, menu);
-		x.addKeyListener(sFrame);
+		main.addKeyListener(sFrame);
 
 		while (menu.isShown()) {
 			Thread.sleep(100);
@@ -76,7 +77,8 @@ public class Main {
 		case HardCodeAI:
 			Thread.sleep(1500);
 
-			HardCodeAI ai = new HardCodeAI();
+			//HardCodeAI ai = new HardCodeAI();
+			AStarAI ai = new AStarAI();
 			int d = 0;
 
 			// main loop
@@ -84,8 +86,26 @@ public class Main {
 				Thread.sleep(gameSpeed);
 				board.setGameSpeed(gameSpeed);
 				if (!aiPause) {
-					d = ai.dir(board.gameState(), d);
-					board.step(JPanel, d, menu.isRandomFoodGeneration());
+					d = ai.dir(board.gameState());
+					
+					// TODO wahre Distanz und geschätzte Distanz ist nicht gleich 
+					// -> wie war nochmal das Prinzip des A* damit umzugehen?
+					if (d == -1) {
+						board.colTiles.clear();
+						for (Point p : ai.getViewed()) {
+							board.colTiles.add(new ColorPoint(p.x + 1, p.y + 2, Color.lightGray));
+						}
+						for (Point p : ai.getPlan()) {
+							board.colTiles.add(new ColorPoint(p.x + 1, p.y + 2, Color.blue));
+						}
+						for (int x = 6; x < 25; x++) {
+							board.colTiles.add(new ColorPoint(x + 1, 9 + 2, Color.gray));
+						}
+						
+						board.repaint();
+					} else {
+						board.step(JPanel, d, menu.isRandomFoodGeneration());
+					}
 				}
 			}
 		case AIBackprop:
@@ -101,8 +121,8 @@ public class Main {
 				board.setGameSpeed(gameSpeed);
 				if (!pause.isPause()) {
 					if (pause.changed) {
-						sFrame.removeKeyListener(x.keys);
-						x.addKeyListener(sFrame);
+						sFrame.removeKeyListener(main.keys);
+						main.addKeyListener(sFrame);
 						pause.changed = false;
 					}
 					d1 = ai1.dir(board.gameState(), d1);
@@ -142,8 +162,8 @@ public class Main {
 				board.setGameSpeed(gameSpeed);
 				if (!pause.isPause()) {
 					if (pause.changed) {
-						sFrame.removeKeyListener(x.keys);
-						x.addKeyListener(sFrame);
+						sFrame.removeKeyListener(main.keys);
+						main.addKeyListener(sFrame);
 						pause.changed = false;
 					}
 					bnn.step(bcanvas, board.gameState());
@@ -193,8 +213,8 @@ public class Main {
 				board.setGameSpeed(gameSpeed);
 				if (!pause.isPause()) {
 					if (pause.changed) {
-						sFrame.removeKeyListener(x.keys);
-						x.addKeyListener(sFrame);
+						sFrame.removeKeyListener(main.keys);
+						main.addKeyListener(sFrame);
 						pause.changed = false;
 						if (pause.getName() != "") {
 							board.setPlayer(new EvPlayer(pause.getName(), null));

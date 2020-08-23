@@ -5,12 +5,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.util.LinkedList;
+
 import evolution.PlayerBase;
 import evolution.SnakeGame;
 
 @SuppressWarnings("serial")
 public class DrawSnake extends SnakeGame implements Static {
 	private Color tileCol = new Color(0, 210, 51);
+	
+	public LinkedList<ColorPoint> colTiles = new LinkedList<ColorPoint>(); 
 
 	private int gameSpeed;
 
@@ -110,13 +114,18 @@ public class DrawSnake extends SnakeGame implements Static {
 					paintTile(g, x, y);
 				}
 			}
+			
+			// paint colored tiles if specified
+			for (ColorPoint p : colTiles) {
+				paintTile(g, p.x * getTileSize(), p.y * getTileSize(), p.getColor());
+			}
 
 			// Paint food
 			paintFood(g, getFoodLoc().x * getTileSize(), getFoodLoc().y * getTileSize());
 
 			// Paint snake
-			for (int i = 0; i < getSnakeBody().size(); i++) {
-				paintSnakeBody(g, getSnakeBody().get(i).x * getTileSize(), getSnakeBody().get(i).y * getTileSize());
+			for (Point p : getSnakeBody()) {
+				paintSnakeBody(g, p.x * getTileSize(), p.y * getTileSize());
 			}
 			paintSnakeHead(g, getSnakeHead().x * getTileSize(), getSnakeHead().y * getTileSize(), getSnakeDir());
 		}
@@ -139,6 +148,11 @@ public class DrawSnake extends SnakeGame implements Static {
 
 	public void paintTile(Graphics g, int x, int y) {
 		g.setColor(getTileCol());
+		g.fillRect(x + 2, y + 2, getTileSize() - 4, getTileSize() - 4);
+	}
+	
+	public void paintTile(Graphics g, int x, int y, Color col) {
+		g.setColor(col);
 		g.fillRect(x + 2, y + 2, getTileSize() - 4, getTileSize() - 4);
 	}
 

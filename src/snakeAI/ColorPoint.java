@@ -12,6 +12,12 @@ public class ColorPoint extends Point {
 		this.y = y;
 		this.color = col;
 	}
+	
+	public ColorPoint(Point p, Color col) {
+		this.x = p.x;
+		this.y = p.y;
+		this.color = col;
+	}
 
 	public Color getColor() {
 		return color;

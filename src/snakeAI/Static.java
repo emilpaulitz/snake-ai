@@ -6,7 +6,7 @@ import java.util.Arrays;
 public interface Static {
 
 	/**
-	 * determines the argmax in the given array
+	 * returns the index of the largest element
 	 */
 	public static int argmax(double[] arr) {
 		double max = arr[0];
@@ -18,6 +18,21 @@ public interface Static {
 			}
 		}
 		return argmax;
+	}
+	
+	/**
+	 * returns the index of the minimum element
+	 */
+	public static int argmin(double[] arr) {
+		double min = arr[0];
+		int argmin = 0;
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] < min) {
+				min = arr[i];
+				argmin = i;
+			}
+		}
+		return argmin;
 	}
 
 	/**
@@ -151,5 +166,17 @@ public interface Static {
 			}
 		}
 		return argmax;		
+	}
+	
+	public static int argmin(int[] arr) {
+		int min = arr[0];
+		int argmin = 0;
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] < min) {
+				min = arr[i];
+				argmin = i;
+			}
+		}
+		return argmin;		
 	}
 }

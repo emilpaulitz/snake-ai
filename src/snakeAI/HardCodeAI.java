@@ -32,7 +32,7 @@ public class HardCodeAI {
 		head = arrToPoint(sndHalf, 1).getFirst();
 		tail = arrToPoint(fstHalf, -1);
 		food = arrToPoint(fstHalf, 1).getFirst();
-
+		
 		if (head.getX() < food.getX()) {
 			if (prevDir != 2 && wontDie(0)) {
 				return 0;
