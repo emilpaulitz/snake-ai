@@ -14,7 +14,7 @@ public class Menu extends JPanel {
 	private boolean shown = true;
 
 	public enum AIOptions {
-		HardCodeAI, AIEvolution, AIBackprop, Player
+		HardCodeAI, AIEvolution, AIBackprop, AIReinforce, Player
 	};
 
 	private AIOptions ai;
@@ -126,6 +126,12 @@ public class Menu extends JPanel {
 						setAi(AIOptions.Player);
 					} else {
 						setRandomFoodGeneration(false);
+					}
+				}
+			case KeyEvent.VK_R:
+				if (shown) {
+					if (ai == null) {
+						setAi(AIOptions.AIReinforce);
 					}
 				}
 				break;

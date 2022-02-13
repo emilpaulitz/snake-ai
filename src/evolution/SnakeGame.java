@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.Arrays;
 import java.util.LinkedList;
 import javax.swing.JPanel;
+
 import snakeAI.Pause;
 import snakeAI.Static;
 
@@ -12,6 +13,7 @@ public class SnakeGame extends JPanel {
 
 	private int width = 1600, height = 850, tileSize = 50, scoreHeight = 50, score = 0, steps = 0;
 
+	// direction of coordinates: x: left to right, y: top to bottom
 	private int boardSizeX = width / tileSize - 2, boardSizeY = height / tileSize - 3, initSize = 1;
 	// => Board size: 30 x 14 (considering scoreboard and walls)
 
@@ -225,6 +227,98 @@ public class SnakeGame extends JPanel {
 	public double[] gameState() {
 		double[] result = new double[2 * getBoardSizeX() * getBoardSizeY()];
 
+		// inscribe body
+		for (Point pointer : getSnakeBody()) {
+			result[(int) (pointer.getX() - 1 + (pointer.getY() - 2) * getBoardSizeX())] = -1;
+		}
+
+		// inscribe food
+		result[(int) (getFoodLoc().getX() - 1 + (getFoodLoc().getY() - 2) * getBoardSizeX())] = 1;
+
+		// inscribe head
+		result[(result.length / 2)
+				+ (int) (getSnakeHead().getX() - 1 + (getSnakeHead().getY() - 2) * getBoardSizeX())] = 1;
+
+		return result;
+	}
+	
+	/**
+	 * returns the game state as a double array of len 16. First 8 cells reflect (manhattan metric) dist
+	 * to an obstacle, last 8 cells are 0 or 1 depending if target is in that direction. First of the 8
+	 * means north, then clockwise in 45° steps.
+	 * 
+	 * @return int[] as described above
+	 */
+	public double[] gameStateDist() {
+		double[] result = new double[16];
+
+		// inscribe obstacles
+		// arr of distances to walls
+		int[] min = new int[8];
+		min[0] = (int) getSnakeHead().getY() - 1;
+		min[2] = (int) (getBoardSizeX() - getSnakeHead().getX() + 1);
+		min[4] = (int) (getBoardSizeY() + 2 - getSnakeHead().getY());
+		min[6] = (int) getSnakeHead().getX();
+		min[1] = Math.min(min[0], min[2]);
+		min[3] = Math.min(min[4], min[2]);
+		min[5] = Math.min(min[4], min[6]);
+		min[7] = Math.min(min[0], min[6]);
+		
+		int headX = (int) getSnakeHead().getX();
+		int headY = (int) getSnakeHead().getY();
+		
+		// check if snake body is closer
+		for (Point p : getSnakeBody()) {
+			int x = (int) p.getX();
+			int y = (int) p.getY();
+			
+			// north-south
+			if (x == headX) {
+				if (y > headY) { // south
+					if (y - headY < min[4]) {
+						min[4] = y - headY;
+					}
+				} else { // north 
+					if (headY - y < min[0]) {
+						min[0] = headY - y;
+					}
+				}
+			}
+			
+			// east-west
+			else if (y == headY) {
+				if (x > headX) { // east
+					if (x - headX < min[2]) {
+						min[2] = x - headX;
+					}
+				} else { // west 
+					if (headX - x < min[6]) {
+						min[6] = headX - x;
+					}
+				}
+			}
+			
+			// NW-SE
+			else if (y - headY == x - headX) {
+				if (x > headX) { // SE
+					if (x - headX < min[3]) {
+						min[3] = x - headX;
+					}
+				} else { // NW 
+					if (headX - x < min[7]) {
+						min[7 ] = headX - x;
+					}
+				}
+			}
+			
+			// NE-SW
+			else if (x - headX == headY - y) {
+				
+			}
+		}
+		
+		// inscribe food
+		
 		// inscribe body
 		for (Point pointer : getSnakeBody()) {
 			result[(int) (pointer.getX() - 1 + (pointer.getY() - 2) * getBoardSizeX())] = -1;

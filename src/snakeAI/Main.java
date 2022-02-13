@@ -15,6 +15,9 @@ import neuralNetwork.DrawNN;
 import neuralNetwork.Lesson;
 import neuralNetwork.NN;
 import neuralNetwork.TrainingSet;
+import reinforcementLearning.Agent;
+import reinforcementLearning.Dir;
+import reinforcementLearning.State;
 
 public class Main {
 	// TODO Ideen:
@@ -61,10 +64,16 @@ public class Main {
 			board = new DrawSnake("Teacher", pause);
 			break;
 		case AIEvolution:
-			board = new DrawSnake(new PlayerBase(20, 30 * 14 * 2, 10, 2, 4), pause);
+			//board = new DrawSnake(new PlayerBase(20, 30 * 14 * 2, 10, 2, 4), pause);
+			// try input as distance to head: 8 inputs give value based on the distance to the next 
+			// obstacle and 8 give 0 or 1 if target lies in that direction
+			board = new DrawSnake(new PlayerBase(20, 16, 10, 2, 4), pause);
 			break;
 		case Player:
 			board = new DrawSnake("Emil", pause);
+			break;
+		case AIReinforce:
+			board = new DrawSnake("NPC", pause);
 			break;
 		}
 
@@ -229,6 +238,48 @@ public class Main {
 					board.repaint();
 				}
 			}
+		case AIReinforce:
+			Thread.sleep(1500);
+
+			State currState = new State(board.getFoodLoc(), board.getSnakeBody(), 
+					board.getSnakeHead(), board.getBoardSizeX(), board.getBoardSizeY());
+			
+			Agent agent = new Agent(currState, 0.9, 10);
+
+			boolean printedActions = false;
+			// main loop
+			while (true) {
+				Thread.sleep(gameSpeed);
+				board.setGameSpeed(gameSpeed);
+				if (!aiPause) {
+					printedActions = false;
+					
+					// Update agent and get direction
+					agent.updateFood(board.getFoodLoc());
+					agent.updateHead(board.getSnakeHead());
+					Dir nextDir = agent.nextMove();
+					
+					board.step(JPanel, nextDir.toInt(), menu.isRandomFoodGeneration());
+					
+				} else {
+					if (!printedActions) {
+						for (Dir direction : Dir.values()) {
+							System.out.print(direction);
+							System.out.print(": ");
+							System.out.println(agent.calcReward(direction, agent.getState()));
+						}
+						
+						for (int i = 0; i < agent.getT(); i++) {
+							System.out.print(agent.bestDirs[i]);
+							System.out.print(": ");
+							System.out.println(agent.rewards[i]);							
+						}
+						
+						System.out.println(agent.getState().toString());
+						printedActions = true;
+					}
+				}
+			}
 		}
 	}
 
@@ -324,6 +375,12 @@ public class Main {
 					break;
 				case Player:
 					pause.pause();
+					break;
+				case AIReinforce:
+					aiPause = !aiPause;
+					if (!aiPause) {
+						System.out.println();
+					}
 					break;
 				}
 				break;
